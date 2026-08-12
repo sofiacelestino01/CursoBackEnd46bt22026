@@ -1,0 +1,24 @@
+bodyy{
+    background-color: aliceblue;
+    margin: 0 auto;
+}
+ table{
+    border-collapse: collapse;
+    width: 400px;
+    font-family: sans-serif;
+ }
+ th {
+     border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+td {
+   border: 1px solid #ccc;
+   padding: 8px;
+   text-align: left;
+}
+
+
+ 
