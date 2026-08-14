@@ -104,8 +104,8 @@ Os tipos de requisição HTTP indicam a ação que o usuário deseja executar no
 
 *PHP* (Hypertext PreProcessor) é uma linguagem de programação interpretada e open source, focada no desenvolvimento de sistemas para WEB, pode ser usada junto com HTML para criação de páginas WEB dinâmica.
 
-*O PHP de fato é uma das linguagens de programação mais populares da atualidade. Ela permite que você crie aplicações web robustas, 
-de uma maneira muito simplificada e direta. A linguagem tem diversos recursos que facilitam e aceleram o processo de desenvolvimento de sites e sistemas para a WEB e além do mais, ela ainda tem um ótimo ecossistema, uma excelente comunidade e um grande mercado de trabalho.*
+O PHP de fato é uma das linguagens de programação mais populares da atualidade. Ela permite que você crie aplicações web robustas, 
+de uma maneira muito simplificada e direta. A linguagem tem diversos recursos que facilitam e aceleram o processo de desenvolvimento de sites e sistemas para a WEB e além do mais, ela ainda tem um ótimo ecossistema, uma excelente comunidade e um grande mercado de trabalho.
 ---
 #### Instalando o PHP
 
@@ -245,5 +245,110 @@ if($valorCompra > 100){
 } else {
     $valorFinal = $valorCompra * 0.95;
 }
+
+```
+
+- Uso `elseif` (If Encadeado) => estrutura usada para manipulação de dados em duas ou mais condicionais
+Exemplo: Compras acima de 200 reais tem 15% de desconto, compras acima de 100 reais de 10% de desconto e demais compras tem 5% de desconto 
+
+```mermaid
+
+graph LR 
+  
+    A[Comando] --> B{Condição 1}
+    B --> |true| C[Ação 1]
+    B --> |false| D{Condição 2}
+    D --> |true| E[Ação 2]
+    D--> |false| F[Ação 3]
+
+```
+
+```php
+
+
+if($valorCompra > 200) {
+    $valorFinal = $valorCompra * 0.85;
+} elseif ($valorCompra > 100) {
+    $valorFinal = $valorCompra * 0.9;
+} else {
+    $valorFinal = $valorCompra * 0.95;
+}
+
+```
+
+*obs*: sempre usar `elseif` para situações que precisam de mais de uma condição, ou seja, fazer encadeamento das condições
+
+- Uso *ERRADO* do if
+
+
+```php 
+
+if($valorCompra > 200) {
+    $valorFinal = $valorCompra * 0.85;
+}
+if($valorCompra > 100) {
+    $valorFinal = $valorCompra * 0.9;
+} else {
+    $valorFinal = $valorCompra * 0.95;
+}
+
+```
+
+##### Operadores Ternários
+
+Um atalho para a estrutura condicional `if/else`, normalmente escrito em uma única linha de código.
+
+` condição ? verdadeira : falsa `
+
+Perfeito para decisões curtas de uma linha de comando 
+Exemplo: Verificar se a pessoa é maior de idade (18);
+
+```php
+
+$idade = 20;
+//O formato é (Condição) ? Verdadeiro : Falso;
+
+$status - ($iade>=18) ? "Maior de idade" : "Menor de idade";
+$status2 = ($idade>=60) ? "Idoso" : ($idade>=18) ? "Adulto" : "Criança" ;
+
+echo $status //
+
+```
+##### Expressão Condicional `match` (PHP 8)
+
+No mercado atual de PHP, não se uma mais uma `Switch/Case` para chegar valores fixos, usa-se o `match`. Ele compara um valor e retorna diretamente o resultado caso atenda a condição.
+
+```mermaid
+
+graph TD 
+    A[Valor] --> B{Condicional}
+    B --> C[Ação 1]
+    B --> D[Ação 2]
+    B --> E[Ação 3]
+    B --> F[Ação 4]
+    B --> G[Ação ...]
+    B --> H[Ação default]
+
+```
+
+
+Exemplo: Selecionar o Dia da Semana a partir de um Nº 
+
+```php
+
+$diaSemanaNum = date("W"); // pega o Dia da Semana em formato mumério
+
+$nomeDiaSemana = match($diaSemanaNum) {
+    "0" => "Domingo",
+    "1" => "Segunda",
+    "2" => "Terça",
+    "3" => "Quarta",
+    "4" => "Quinta",
+    "5" => "Sexta",
+    "6" => "Sábado",
+    "default" => "Dia Inválido"
+};
+
+echo "Hoje é : $nomeDiaSemana";
 
 ```
