@@ -11,20 +11,49 @@ $funcionarios = [
 
 $totalFolha = 0;
 
-foreach ($funcionarios as $funcionario) {
+?>
 
-    echo "Nome: " . $funcionario["nome"];
-    echo "\n";
+<!DOCTYPE html>
 
-    echo "Cargo: " . $funcionario["cargo"];
-    echo "\n";
+<html>
 
-    echo "Salário: R$ " . $funcionario["salario"];
-    echo "\n";
+<head>
+    <title>Funcionários</title>
+</head>
 
-    $totalFolha = $totalFolha + $funcionario["salario"];
-}
+<body>
 
-echo "Total gasto pela empresa: R$ " . $totalFolha;
+<h1>Funcionários</h1>
+
+<table border="1">
+
+<tr>
+    <th>ID</th>
+    <th>Nome</th>
+    <th>Cargo</th>
+    <th>Salário</th>
+</tr>
+
+<?php foreach ($funcionarios as $funcionario) { ?>
+
+<tr>
+    <td><?php echo $funcionario["id"]; ?></td>
+    <td><?php echo $funcionario["nome"]; ?></td>
+    <td><?php echo $funcionario["cargo"]; ?></td>
+    <td>R$ <?php echo $funcionario["salario"]; ?></td>
+</tr>
+
+<?php
+$totalFolha = $totalFolha + $funcionario["salario"];
+} ?>
+
+</table>
+
+<h2>Total: R$ <?php echo $totalFolha; ?></h2>
+
+</body>
+
+</html>
+
 
 
