@@ -1,0 +1,38 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nome": "Maria",
+      "profissao": "Advogada",
+      "status": "ativo"
+    },
+    {
+      "id": "2",
+      "nome": "João",
+      "profissao": "Motorista",
+      "status": "inativo"
+    },
+    {
+      "id": "3",
+      "nome": "Joana",
+      "profissao": "Escrituraria",
+      "status": "inativa"
+    },
+    {
+      "id": "4",
+      "nome": "Pedro",
+      "profissao": "Consultor",
+      "status": "ativo"
+    },
+    {
+      "id": "sT0z-gi3yTo"
+    },
+    {
+      "nome": "Bruno",
+      "profissao": "Pedreiro",
+      "status": "inativo",
+      "id": "mGCBPLy0rDE"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
