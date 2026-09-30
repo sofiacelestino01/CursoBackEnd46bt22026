@@ -1,0 +1,7 @@
+```gitignore
+# Arquivo com as credenciais do banco
+config/database.ini
+
+# Arquivos de log
+logs/*.log
+```
