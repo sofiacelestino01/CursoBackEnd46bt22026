@@ -9,5 +9,11 @@ final class AlmoxarifadoDAO{
     private PDO $pdo;
 
     // métodos -> ações
+    //método que toda classe tem -> Construtor -> permite instanciar objetos
+    public function __constructor(PDO $pdo){
+        $this->pdo = $pdo;
+    }
+
+    // métodos do CRUD
 
 }
