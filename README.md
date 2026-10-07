@@ -1529,4 +1529,114 @@ Enquanto os cookies residem no Navegador, os dados da sessão ficam armazenados 
 
 ```mermaid
 flowchart
-    subgraph Cliente ["Clinte-Side"]
+    subgraph Cliente ["Cliente-Side(Navegador)"]
+        cliente["Interface do Usuário"]
+        cookie["Cookie de Sessão"]
+    end
+
+    subgraph Servidor ["Server-Side(Servidor)"]
+        servidor["Servidor PHP"]
+        memoria["SuperGlobal $_SESSION"]
+        disco["Token"]
+    end
+
+    cliente -->|"Interage com a UI"| cookie
+    cookie --> |"Envia Token no Header HTTP"| servidor
+    servidor -->|"Lê o Token e Carrega Dados"| memoria
+    memoria <-->|"Persistência em Disco"| disco
+    servidor -->|"Garante a Autenticação do Usuário"| cliente
+
+      style cliente fill:#ff00aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style cookie fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style servidor fill:#aa00ff,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style memoria fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style disco fill:#e2e8f0,stroke:#64748b,stroke-width:2px,color:#1e293b   
+```
+
+**Sintaxe Ess4ncial do PHP para Sessão**
+
+```php
+//configurar as sessão com funções nativas do PHP(ler documentação)
+
+//1. Configurar as flags dos cookies Antes de abrir a sessão
+session_set_cookie_params([
+    "lifetime"      => 0,       // Cookie expira ao fechar o navegador
+    "path"          => "/"      // Válido para todas as páginas do dominio
+    "httponly"      => true     // Proteção contra XSS
+    "samesite"      => "Lax"    // Proteção contra CSRF
+]);
+
+// 2. Iniciar ou restaurar a session ativa
+session_start();
+
+// 3. Gravar os dados da sessão (após validar o login)
+//usar seperglobais($_SESSION) para isso
+$_SESSION["usuario_id"] = 10;
+$_SESSION["usuario_perfil"] = "ADMIN";
+
+// 4. PErmitir a leitura dos dados em qualquer página do meu site
+$idLogado = $_SESSION["usuario_id"] ?? null; // se o usuario não tiver feito login a session é null
+
+```
+
+#### **Criptografia de Senhas**
+
+no passado, desenvolvedores armazenavam senhas utilizando funções matemáticas de integridade como `md5($senha)` ou `sha1($senha)`.
+
+> O MD5 foi quebrado em 2004 e SHA1 foi quebrado em 2017.
+
+**A Solucção Moderna é Criptografia com uso de Hash**
+
+O padrão de criptografia utilizado são o `Argon2id`, ou o `Bcrypt`
+
+**Caracteristicas da Criptografia de Hash**
+1. **Unidirecional(One-Way):** É matematicamente impossível descriptografar o hash para recuperar a senha original, já que o hash muda cada milisegundo
+2. **Salt Automático e Aleatório**: A cada execução, a função gera um vetor de `salt` único de 16bytes. Mesmo que 2 pessoas tenham a mesma senha, os hashes gerados serão completamente diferentes!.
+3. **Custo Ajustáveis**: É possível calibrar quanto de memória o algoritmo levará para calcular o hash
+
+**Sintax Profissional de Cryptografia Moderna**
+
+```php
+$senhaDigitada = *******
+//
+$hash = password_hash($senhaDigitada, PASSWORD_ARGON2ID);
+//saída:  $argon2id$v=19#m65536,t=4,p=1$jkhdsfhl...(comprimento ~96 a 128 chars)
+```
+**O processo de Descriptografia**
+```php
+$senhaInformada = $_POST["senha"];
+$hashDoBanco    = $usuario["hash"];
+
+//o processo de verificação
+if(password_verify($senhaInformada, $hashDoBanco)){
+    //Senha Correta
+} else{
+    //Senha Incorreta
+}
+```
+>[Aviso|]
+> Nunca tente fazer (password_hash($senha) === $hashDoBanco)
+> Como o `password_hash` gera um salt aleatório a cada milisegundo, a comparação por igualdade **sempre será falso**
+> A Verifiação deve ser feita **exclusivamente** com a função `password_verify()`
+
+#### **Arquitetura de Autenticação: Middleware (guard)**
+
+Para impedir que visitantes não logados acessem páginas privadas ( como dashboard.php ou relatorios.php), criamos interceptadores chamados **Guards (Middlewares de Proteção)**.
+
+```mermaid
+flowchart TD
+    req["Requsição do Navegador<br/>GET(dashboard.php)"]--> guard["Middleware: guard.php"]
+
+    guard --> check{"$_SESSION[usiario_id existe?]"}
+    check -- Não --> kick["header(login.php)"]
+    check -- Sim --> allow["header(dashboard.php)"]
+```
+**Como usar o guard.php**:
+
+Em todas as páginas restritas do sistema a **primeira linha de código** após o `declare(strict_types=1)` será:
+
+```php
+required_once __DIR__ . "/src/guard.php";
+```
+
+Se a pessoa não estiver autenticada ou não tiver o perfil de acesso, ela é expulsa antes mesmo que qualuqer byte de HTML seja renderizado.
