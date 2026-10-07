@@ -1449,4 +1449,84 @@ flowchart
     B --> |"Executa Prepared Statement<br/>via PDO" | C
 
 ```
+
+---
+
+### Semana 10 - Sessões, Cokkies e Autenticação Segura
+
+**Tema:** Gestão de Estado com HTTP, Ciclo de Vida Sessão (`$_SESSION`), Cookies, Hashing de Criptografia, Middleware de Autenticação
+
+#### **O Protocolo HTTP: Como ele lembra de você?**
  
+ 
+O Protocolo HTTP é totalmente **STATELESS (sem armazenamento de estado)**. Isso Significa que o servidor web trata cada requisição HTTP de forma isolada, como se fosse a primeira vez que ele estivesse interagindo com o usuário do sistema.
+
+**Situação sem Armazenamento de Cookie e SESSION**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Cliente as Navegador do Usuário
+    participant Servidor as Servidor PHP/BD
+
+    Cliente ->> Servidor: 1. POST /login.php (Usuário envia email e senha)
+    Servidor-->> Cliente: 2. HTTP 200 OK(Credenciais válidadas!)
+    Note over Servidor: A conexão TCP é encerrada. O Servidor esquece quem é o Usuário
+
+    Cliente->>Servidor: 3. GET/dashboard.php (Usuário tenta ler os relatórios)
+    note over Servidor: Servidor: "Quem é você? Nunca te vi antes!"
+    Servidor -->> Cliente: 4. HTTP 302 Redirect -> login.php
+```
+
+Para Resolver esse problema sem obrigar o usuário a digitar o logine senha novamente a cada clique fazemos o seguinte:
+1. Ao fazer o login bem-sucedido, o servidor entrega ao cliente uma **comanda/pulseira VIP numerada** (um identificador de sessão unica e aleatória)
+2. O navegador armazena essa comanda/pulseira em um **Cookie**
+3. A cada nova página solicitado, o navegador apresenta automaticamente essa pulseira no cabeçalho da requisição
+4. O PHP l^o número da comanda/pulseira, localiza os dados do usuário aramazenado na memoria do servidor(`$_SESSION`) e reconhece quem é ele!
+
+**Situação com Artmazenamento de Cookie e SESSION**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Navegador as Navegador do Usuário
+    participant Servidor as Servidor PHP/BD
+    participant Sessao as Armazenamento de $_SESSION
+
+    Navegador->>Servidor: POST/login.php(envia usuário e senha)
+    Servidor->> Servidor: Valida as Credenciais
+    Servidor->>Sessao: Armazena os dados dos usuário em $_SESSION
+    Sessao-->>Servidor: Retorna a ID da Sessão
+    Servidor-->>Navegador: Resposta com Set-Cookie: PHPSESSID=<ID da sessão>
+    Note over Navegador: Guarda o ID da sessão no cookie
+
+    Navegador->>Servidor: GET/dashboard.php com Cookie: PHPSESSID=<ID da sessão>
+    Servidor->>Sessao: Busca os dados associados ao ID da sessão
+    Sessao-->> Servidor: Retrona os dados do Usuário
+    Servidor-->>Navegador: Exibe o dashboard autenticado
+
+```
+
+#### **Como funciona o Cookie HTTP**
+
+Um **Cookie** é um pequeno arquivo de texto(geralmente limitado a 4KB) gravado pelo navegador a pedido do servidor, através do cabeçalho de resposta `Set-Cookie`
+
+**Cookie podem vazar Informações**
+
+Sim, se um cookie de sessão for configurado com parâmetros desprotegidos, qualquer script malicioso injetado na página(XSS) pode roubar a sessão do usuário logado.
+
+**Para evitar problemas de Segurança em Cookie: usando Flags de segurança.**
+
+| Flag de Segurança | O que ela faz? | Por que é indispensável? |
+| :--- | :--- | :--- |
+| **`HttpOnly`** | Impede que scripts JavaScript executem leitura no cookie via `document.cookie`. | **Neutraliza o roubo de sessão via XSS!** Mesmo que haja uma falha de injeção de script na tela, o navegador proíbe o JavaScript de ler o identificador de sessão. |
+| **`SameSite=Lax`** | Restringe o envio do cookie apenas a navegações originadas do próprio domínio. | **Protege contra ataques CSRF** (*Cross-Site Request Forgery*), impedindo que links externos forjem ações logadas. |
+| **`Secure`** | Garante que o cookie só seja transmitido em conexões criptografadas com **HTTPS**. | Impede que bisbilhoteiros em redes Wi-Fi públicas interceptem a sessão em trânsito (*Man-in-the-Middle*). *(Em ambiente local de desenvolvimento sem SSL, pode ser desativado temporariamente).* |
+
+#### **O Ciclo de Vida da SESSÃO em PHP: `$_SESSION` no servidor**
+
+Enquanto os cookies residem no Navegador, os dados da sessão ficam armazenados com **privacidade total dentro do servidor** (em um arquivo temporário na memória)
+
+```mermaid
+flowchart
+    subgraph Cliente ["Clinte-Side"]
