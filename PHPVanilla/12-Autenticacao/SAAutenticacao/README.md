@@ -98,3 +98,43 @@ final class ConexaoBanco {
     }
 }
 ```
+
+## Camada de Acesso a Dados ( `src/UsuarioDAO.php`)
+
+Isolar as operações de busca e cadastro de usuários, aplicando o hashing de senha com `password_hash()`
+
+criar os métodos: 
+- Cadastrar (Create)
+- busca por email (Read)
+- Verificar se email já existe (Read)
+
+## Fazer o Serviço de Autenticação (`src/AuthService.php`)
+
+classe que ira criar o ciclo de vida da sessão do usuário: cookies(navegador) e as sessão(servidor)
+
+> obs: classe tipo static (não existe instnaciamento de objetos)
+
+AuthService.php
+- iniciarSessaoSegura() => passa as informações para cookies
+- autenticar() -> passa as informações para a superglobal
+- sessaoExpirada() => verifica o tempo de inatividade
+- sessionDestroy() => finaliza a sessão e limpas os cookies do navegador
+
+## Middleware Interceptador (`src/guard.php`)
+
+bloqueia visitantes não autenticados ou sessões expiradas em páginas internas
+
+- verifica os estado da sessão
+- verifica se a sessão não expirou
+
+## Criar as Telas
+
+### Tela de Cadastro (`cadastro.php`)
+
+### Tela de Login (`login.php`)
+
+### Tela de Dashboard (`dashboard.php`)
+
+### Campo de logout (`logout.php`)
+
+
