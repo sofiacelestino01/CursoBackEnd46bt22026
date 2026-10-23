@@ -15,12 +15,22 @@ final class ContaPoupanca extends ContaBancaria {
         if($valor<= 0.0){ // se valor negativo
             throw new ValorInvalidoException($valor);
         }
-        if($valor > $this->saldo) { //valor > saldo
+        if($valor > $this->saldo) { //se valor > saldo
             throw new SaldoInsuficienteException($this->saldo, $valor);
         }
 
         //se estiver tudo certo
         $this->saldo -= $valor;
+    }
+
+    //criar o método apra calcualr juros
+    public function renderJuros(float $percentual):void {
+        if($percentual <=0.0) {
+            throw new ValorInvalidoException($percentual);
+        }
+        // se tudo estiver certo
+        $rendimento = $this->saldo * ($percentual/100);
+        $this->saldo += $rendimento;
     }
 
 }
