@@ -1,0 +1,10 @@
+{
+	"Meu PHP Snippet": {
+		"prefix": "php",
+		"body":[
+			"<?php",
+			"declare(strict_types=1);"
+		],
+		"description":"Inicia o PHP com strict_types"
+	}
+}
