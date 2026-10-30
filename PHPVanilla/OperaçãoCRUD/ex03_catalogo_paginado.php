@@ -1,33 +1,46 @@
 <?php
+
 declare(strict_types=1);
 
-require 'conexao.php';
+require_once 'database.php';
 
-// Recebe o número da página.
-$pagina = max(1, (int) ($_GET['p'] ?? 1));
-$offset = ($pagina - 1) * 5;
-
-// Busca cinco peças por página.
-$stmt = $pdo->prepare(
-    "SELECT id, nome FROM pecas_industriais
-     ORDER BY id
-     LIMIT :limite OFFSET :offset"
-);
-
-// Define os parâmetros como números inteiros.
-$stmt->bindValue(':limite', 5, PDO::PARAM_INT);
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt->execute();
-
-// Exibe os resultados com escape de HTML.
+// Escapa valores antes de exibi-los no HTML.
 function e(string $valor): string
 {
     return htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
 }
 
-foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $peca) {
-    echo e((string) $peca['id']) . ' - ';
-    echo e((string) $peca['nome']) . "<br>\n";
-}
+// Calcula a página e o deslocamento.
+$pagina = max(1, (int) ($_GET['p'] ?? 1));
+$offset = ($pagina - 1) * 5;
 
-echo '<a href="?p=' . ($pagina + 1) . '">Próxima página</a>';
+// Consulta cinco peças por página.
+$sql = 'SELECT id, nome, quantidade FROM pecas_industriais ORDER BY id LIMIT :limite OFFSET :offset';
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':limite', 5, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$pecas = $stmt->fetchAll();
+?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de peças</title>
+</head>
+<body>
+    <h1>Catálogo de peças industriais</h1>
+
+    <?php foreach ($pecas as $peca): ?>
+        <p>
+            <?= e((string) $peca['id']) ?> -
+            <?= e((string) $peca['nome']) ?> -
+            Estoque: <?= e((string) $peca['quantidade']) ?>
+        </p>
+    <?php endforeach; ?>
+
+    <a href="?p=<?= max(1, $pagina - 1) ?>">Anterior</a>
+    <a href="?p=<?= $pagina + 1 ?>">Próxima</a>
+</body>
+</html>

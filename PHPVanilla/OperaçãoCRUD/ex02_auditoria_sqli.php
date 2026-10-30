@@ -1,30 +1,30 @@
 <?php
+
 declare(strict_types=1);
 
-require 'conexao.php';
+require_once 'database.php';
 
-// Consulta vulnerável, somente para demonstração.
-function buscarVulneravel(PDO $pdo, string $termo): void
+// Demonstra a consulta vulnerável à injeção SQL.
+function buscarVulneravel(string $termo): void
 {
-    $sql = "SELECT * FROM ferramentas WHERE nome = '$termo'";
+    global $pdo;
+
+    $sql = "SELECT id, nome FROM ferramentas WHERE nome = '$termo'";
     $resultado = $pdo->query($sql);
-
-    echo "Vulnerável: " . $resultado->rowCount() . " registros.\n";
+    echo 'Vulnerável: ' . $resultado->rowCount() . " registro(s).\n";
 }
 
-// Consulta protegida com parâmetro nomeado.
-function buscarProtegido(PDO $pdo, string $termo): void
+// Demonstra a consulta protegida com parâmetro.
+function buscarProtegido(string $termo): void
 {
-    $stmt = $pdo->prepare(
-        "SELECT * FROM ferramentas WHERE nome = :nome"
-    );
-    $stmt->execute([':nome' => $termo]);
+    global $pdo;
 
-    echo "Protegido: " . $stmt->rowCount() . " registros.\n";
+    $stmt = $pdo->prepare('SELECT id, nome FROM ferramentas WHERE nome = :nome');
+    $stmt->execute([':nome' => $termo]);
+    echo 'Protegido: ' . $stmt->rowCount() . " registro(s).\n";
 }
 
-// Compara os dois métodos com o mesmo texto.
+// Compara o comportamento das duas consultas.
 $termo = "' OR '1'='1";
-
-buscarVulneravel($pdo, $termo);
-buscarProtegido($pdo, $termo);
+buscarVulneravel($termo);
+buscarProtegido($termo);
