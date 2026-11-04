@@ -918,11 +918,11 @@ if(isset($_POST["nome"])){
 }
 ```
 
->obs: use htmlspecialchars() ao exibir valor em HTML => converte caracteres especiais em entidades correspondentes em HTML, evitando que o código seja interpretado erradamente pelo navegador. É usado principalmente na segurança web evitar ataques Cross-Sites-Scrinpting(XXS).
+>obs: use htmlspecialchars() ao exibir valor em HTML => converte caracteres especiais em entidades correspondentes em HTML, evitando que o código seja interpretado erradamente pelo navegador. É usado principalmente na segurança web para evitar ataques Cross-Site-Scripting(XSS).
 
-#### Validação de Dados no BACKEnd é Obrigaória.
+#### Validação de Dados no BACKEnd é Obrigatória.
 
-Muitos desenvolvedores iniciantes acreditam que colocar atributos `required`, `type=email` ou `min=0` na <tag> o HTML é suficiente para proteger o sistema. **Isso é uma ilusão!**. Sempre fazer as validações de dados no código BackEnd.
+Muitos desenvolvedores iniciantes acreditam que colocar atributos `required`, `type=email`ou `min=0`na <tag> do HTML é suficiente para proteger o sistema. **Isso é uma ilusão!**. Sempre fazer as validações de dados no código BackEnd
 
 ##### Funções Nativas Essenciais para Limpeza e Validação de Dados
 
@@ -943,10 +943,10 @@ A validação no Back-End deve acontecer sempre antes do processamento de qualqu
 | `preg_match($padrao, $valor)` | Valida por expressão regular | CPF, CEP, telefone, senha forte | `preg_match('/^\d{5}-\d{3}$/', $cep)` |
 | `filter_input(INPUT_POST, 'campo', FILTER_SANITIZE_SPECIAL_CHARS)` | Captura e limpa dados da requisição | Ler entradas com segurança | `$nome = filter_input(INPUT_POST, 'nome', FILTER_SANITIZE_SPECIAL_CHARS);` |
 
+
 #### Preservação de Estado em Formulários (*Sticky Form*)
 
 A técnica do **Sticky Form** consiste em imprimir de volta no atributo "value" do input os dados que o usuário acaba de digitar caso ocorra um erro de validação de dados. 
-
 
 **Exemplo de Uso:**
 
@@ -966,26 +966,30 @@ A técnica do **Sticky Form** consiste em imprimir de volta no atributo "value" 
 
 ### Semana 7 - Segurança no BackEnd - Sanitização, Validação e Proteção contra XSS
 
-#### 1º  Mandamento do Desenvolvedor BackEnd - 
+#### 1º Mandamento do Desenvolvedor BackEnd - 
 
-> Nunca confie no Usuário : Toda entrada de dados vindo de fora do servidor é potencialmente maliciosa até que seja rigorosamente validada, sanitizada e codificada.
+> Nunca Confie no Usuário : Toda entrada de dados vindo de fora do servidor é potenciamente maliciosa até que seja rigorosamente validada, sanitizada e codificada.
 
-Quando você dispomibiliza um campo de texto em um site, qualquer pessoa conectada a internet pode digitar códigos maliciosos em vez de texto. Se o código BackEnd pega esse texto diretamente sem nenhum tratamento, a ordem de execução de códigos abrirá porta para a invasão de devastadoras do seu sistema.
+Quando você disponibiliza um campo de texto em um site, qualquer pessoa conectada a internet pode digitar códigos maliciosos em vez de texto. Se o código BackEnd pega esse texto diretamente sem nenhum tratamento, a ordem de execução de códigos abrirá porta para a invasão devastadoras do seu sistema.
 
 #### A Anatomia de um Ataque: O que é Cross-Site Scripting (XSS)
 
-O XSS ocorre quando uma aplicação web inclui dados não confiaveis de uma página web sem a devida validação ou escape de caracteres. Isso permite que um atacante execute scripts maliciosos(geralmente em javaScript) diretamnete no navegador de outro usuário que visitam o site.
+O XSS ocorre quando uma aplicação web inclui dados não confiaveis em uma página web sem a devida validação ou escape de caracteres. Isso permite que um atacante execute scripts maliciosos(geralmente em javaScript) diretamente no navegador de outro usuário que visitam o site.
 
-**Como o Ataque Acontece:**
-1. Roubo de Sessão(Cookie Strealing): O JavaScript injetado lê os cookies de autenticação de vítimas (document.cookie) e os envia para o servidor do atacante, permitindo que ele faça login na conta de vítima sem precisar de senha.
+**As Principais Modalidade de Ataques:**
+
+1. *Roubo de Sessão(Cookie Stealing)*: O JavaScript injetado lê os cookies de autenticação da vítima (documente.cookie) e os envia para o servidor do atacante , permitindo que ele faça login na conta da vítima sem precisar de senha.
 
 2. *Desconfiguração do Site(Defacement)*: Alterar visualmente o site, inserindo mensagens falsas, banners ofensivos ou formulários de login fraudulentos (phising interno).
 
-3. *Redirecionamento Malicioso*: Força o navegador da vítima a abrir sites com vírus ou páginas clonadas de banco.
+3. *Redirecionamento Malicioso*: Força o navegador da víima a abrir sites com vírus ou páginas clonadas de banco.
 
 4. *Captura de Teclas(Keylogger)*: Grava tudo o que a vítima digita enquanto a página estiver aberta.
 
+---
+
 **Os Vetores de Ataques Mais Frequentes:**
+
 
 Nem todo ataque XSS usa a tag óbvia `<script>`. Desenvolvedores que tentam bloquear XSS apenas "apagando a palavra script" são facilmente burlados por atacantes:
 
@@ -997,7 +1001,8 @@ Nem todo ataque XSS usa a tag óbvia `<script>`. Desenvolvedores que tentam bloq
 | `<a href="javascript:alert('XSS')">Clique</a>` | O clique no link executa a pseudo-URL com JavaScript em vez de abrir um site. |
 | `"><script>alert('XSS')</script>` | Usado quando o dado é impresso dentro de um `<input value="...">`, quebrando o atributo e injetando a tag. |
 
-**A Tríade de Defesa: Validação, Sanitização e Escapamento**
+
+#### **A Tríade da Defesa: Validação, Sanitização e Escapamento**
 
 ```mermaid
 
@@ -1021,13 +1026,14 @@ flowchart LR
 
 Ex: Verificar se o e-mail possui `@` e dominio válido (`filter_var($email, FILTER_VALIDATE_EMAIL)`).
 
-2. **Sanitização**: Transforma o dado para adequa-lo ao formato desejado, removendo caracteres indesajados.
+2. **Sanitização**: Transforma o dado para adequa-lo ao formato desejado, removendo caracteres indesejados
 
 Ex: Remover espaços no ínicio e fim (`trim($nome)`)
 
 3. **Escapamento/Codificação de Saída**: é o ato de converter caracteres especiais de linguagem HTML em suas respectivas **Entidades HTML** no momento exato em que eles são impressos na tela.
 
 Ex: usar `htmlspecialchars()`
+
 
 #### **A Ferramenta PRincipal: `htmlspecialchars()`**
 
@@ -1109,24 +1115,26 @@ if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
 }
 ```
 
-### Semana 8 - Persistência de Dados com Banco de Dados Relacionados (PostgresSQL) e Conexão PDO
+---
 
-**Tema** Camada de acesso a Dados, DriverPDO(PHP Data Objects), Driver `pdo_pgsql`, Padrão Singleton, Isolamento de Credenciais(`.env` `.ini`) e Tratamento de Exceções (`PDOException`)
+### Semana 8 - Persistência de Dados com Banco de Dados Relacionais (PostgreSQL) e Conexão PDO
+
+**Tema:** Camada de acesso a Dados, DriverPDO(PHP Data Objects), Driver `pdo_pgsql`, Padrão Singleton, Isolamento de Credenciais(`.env` `.ini`) e Tratamento de Exceções(`PDOException`)
 
 #### **1. Da Memória Volátil ao Banco de Dados**
 
-Em sistemas corporativos de grande porte, arquivos planos (`.txt` `.json`) não oferecem a segurança, integridade, concorrencia e velocidade necessária para armazenamentos de dados. Então é aqui que o **BackEnd** encontra o **Banco de Dados Relacional**.
+Em sistemas corporativos de grande porte, arquivos planos (`.txt` `.json`) não oferecem a segurança , integridade, concorrencia e velocidade necessária para armazenamentos de dados. Então é aqui que o **BackEnd** encontra o **Banco de Dados Relacional**.
 
 Banco de Dados Relacional Permite:
 - Conectar a lógica de programação server-side ao Sistema de Gerenciamento de Banco de Dados (SGBD).
-- Garantindo pesistência definitiva e segura dos registros.
+- Garantindo persistÊncia definitiva e segura dos registros.
 - Aplicando integridade referencial, constraints, consultas otimizadas e produtividade ACID aprendidas na disciplina de Banco de Dados.
 
 > obs: ACID:
 > Atomicidade, assegura que cada transação seja única.
-> Consistência, respeita todas as regras,  restrições e chaves definidas, garatindo a validade de transação.
-> Isolamento transações são realizadas de forma independente.
-> Durabilidade,tranformações são confirmadas, garantindo persistência permanente.
+> Consistência, respeita todas as regras, restrições e chaves definidas, garantindo a validade da transação.
+> Isolamento, transações são realizadas de forma independente.
+> Durabilidade, transações são confirmadas, garantindo persistência permanente. 
 
 ```mermaid
 flowchart LR
@@ -1170,8 +1178,8 @@ flowchart TB
 #### **3. Vantagens do uso do PDO**
 
 - **Portabilidade de Código**: Os métodos de conexão, consulta e transções são identicos, independente do banco utilizado. Se o cliente migrar de banco Postgres para outrro SGBD(MySQL), o programador apenas altera a string DSN de conexão, preservando toda a lógica de acesso já utilizada ou criada.
-- **Suporte Nativo a Prepared Statement**: O PDO foi projetado para trabalhar com consultas nativas,  oferencendo defesa contra ataques de **SQL_Injection**.
-- **Tratamento Orientado a Objetos com Exception**: Em vez de retorna códigos de erros, o PDO lança uma instancia da classe especializada `PDOExcepton`.
+- **Suporte Nativo a Prepared Statement**: O PDO foi projetado para trabalhar com consultas nativas, oferencendo defesa contra ataques de **SQL_Injection**.
+- **Tratamento Orientado a Objetos com Exception**: Em vez de retronar códigos de erros, o PDO lanca uma instancia da classe especializada `PDOExcepton`.
 
 **A Sintaxe da Conexão PDO: DSN(Data Source Name)**
 
@@ -1212,24 +1220,25 @@ $opcoes = [
 
 - PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC : por padrão o métos `fetch()`retrona um array duplicado ontendo índices numéricos`[0,1]`e associativos`["id","código_maquina"]`. Definir `FETCH_ASSOC`reduz o consumo de memória RAM pela metade e entrega coleções limpas.
 
-- PDO::ATTREMULATE_PREPARES => false : Garante que o PHP envie a consulta e os parâmetros separados diretamente para o planejador do BD processar, blindando e aplicação contra ataques sofisticados de `SQL_injection`
+- PDO::ATTR_EMULATE_PREPARES => false : Garante que o PHP envie a consulta e os parâmetros separados diretamente para o planejador do BD processar, blindando e aplicação contra ataques sofisticados de `SQL_injection`
+
 
 #### **5. Proteção de Credenciais**
 
 Um dos erros mais graves cometidos por desenvolvedores iniciantes é escrever dados de conexão diretamente dentro do código:
 
 ```php
-//péssima prática de código"
-$pdo = new PDO("pgsql:host"=localhost; dbname="producao"; "postgres"; "senha12345");
+//péssima prática de código
+$pdo = new PDO("pgsql:host=localhost; dbname="producao"; "postgres"; "senha12345");
 //observer que as credenciasi estão expostas nos código
 ```
 
 Se esse arquivo for versionado e enviado para GitHub:
 1. Suas senhas de produção ficam públicas
 2. Robôs maliciosos varrem repositórios à procura de credenciais expostas, para invadir banco de dados e sequestrar informações(ataque de Ransoware)
-3. A empresa é penalizada por violações da **LGPD(Lei Geral de Proteção de Ddaos)**
+3. A empresa é penalizada por violações da **LGPD(LEi Geral de Proteção de Dados)**
 
-**A Abordagem Segura: Usando Arquivos de Configurações Isolada (`.ini` ``.env`)**
+**A Abordagem Segura: Usando Arquivos de Configuração Isolada (`.ini` `.env`)**
 
 Isolamos as credenciais em um arquivo externo protegido que **nunca entra no Git**
 
@@ -1256,19 +1265,18 @@ logs/*.log
 
 #### **6. Padrão Singleton de Conexão**
 
-Imagian uma aplicação web com 500 usuários acessando simultaneamente. Se cada script, função ou método executar `new PDO()`, ou seja, abrir uma nova conexâo, sempre qu precisar consultar o banco de dados, teremos milhares de conexão de redes abertas desnecessariamente.
+Imagian uma aplicação web com 500 usuários acessando simultaneamente. Se cada script, função ou método executar `new PDO()`, ou seja, abrir uma nova conexão, sempre que precisar consultar o banco de dados, teremos milhares de conexão de redes abertas desnecessariamente.
 
-No SGBD(PostgreSQL), cada conexão aberta cria um processo no sistema operacional dedicado. Abrir conexões repetidas esgotam rapidamente o limite configurado (`max_connection`) do BD gerando um erro;
+No SGBD(PostgreSQL), cada conexão aberta cria um processo no sistema operacional dedicado. Abrir conexões repetidas esgotam rapidamente o limite configurado (`max_connection`) do BD gerando um erro:
 `Fatal Error: sorrym, too many clients already`
 
 **Como o Singleton Resolve Isso**
 
-O padrâo **Singleton** garante que **apenas uma única instancia de conexão PDO exista por requisição**, reutilizando a conexão existente em qualquer ponto do sistema. 
+O pdrão **Singleton** garante que **apenas uma única instancia de conexão PDO exista por requisição**, reutilizando a conexão existente em qualquer ponto do sistema. 
 
 **As Configurações do Singleton**
 1. **Construtores Privados** (`private function _constructor`): Impede que outros arquivos instanciem uma nova conexão
-2. **Propriedade/Atributos Estáticas Privadas**: (`private static ?PDO $instancia = null`)
-: Aramzena a Conexão aberta na Classe
+2. **Propriedade/Atributos Estáticas Privadas**: (`private static ?PDO $instancia = null`): Aramzena a Conexão aberta na Classe
 3. **Métodos de acesso Estáticos Públicos**: (`public static function obterConexao():PDO`): A Conexão é criada pelo método, garantindo acesso a conexão, mas não acesso aos atributos da conexão, se caso já existir uma conexão, apenas devolve a conexão existente para o operador, sem a necessidade de crir uma nova.
 4. **Bloqueio de Clonagem e Desserialização**: (`_clone` e `_wakeup`): Garantir que ninguém consiga duplicar o objeto da conexão.
 
@@ -1308,12 +1316,11 @@ Na Semana 08 , aprendemos a como conectar usando a extensão PDO e utilizando o 
 
 --- 
 
-#### **A Maior Ameça da História da Web: SQL Injection (`SQLi`)**
+#### **A Maior Ameaça da História da Web: SQL Injection (`SQLi`)**
 
 Antes de Escrevermos a primeira query de manipulação, precisamos compreender o perido que cerca o acesso a banco de dados.
 
-A vulnerabilidade **SQL Injection** que ocupa o topo das listas mais críticas de cibers
-egurança. Ela Ocorre quando um desenvolvedor comete um erro gravíssimo de **concatenar entradas fornecidas pelo usuário diretamente na instrução SQL**
+A vulnerabilidade **SQL Injection** que ocupa o topo das listas mais críticas de cibersegurança. Ela Ocorre quando um desenvolvedor comete um erro gravíssimo de **concatenar entradas fornecidas pelo usuário diretamente na instrução SQL**
 
 **Exemplo de Código Proibido (Concatenação de String)**
 
@@ -1327,7 +1334,7 @@ $senha = $_POST["senha"];
 
 $sql = "SELECT * FROM usuarios WHERE login = '".$usuario . "'AND senha= '" .$senha ."'";
 $resultado = $pdo->query($sql)
-``` 
+```
 
 **O que acontece quando o atacante digita: `admin' --`?**
 
@@ -1340,9 +1347,7 @@ SELECT * FROM usuarios WHERE login = 'admin' --' AND senha= '...'
 1. A aspa digita pelo atacante fecha a string do login antecipadamente
 2. O operador `--`no Banco de Dados indica o **início de um comentário** 
 3. O restante da query (a validação de senha) é ignorada pelo morto de busca do banco
-4. **Resultado:** o invasor faz login instantaneamente na conta do administrador sem precisar saber senha.
-
----
+4. **Resultado:** o invasor faz login instantaneamente na conta do administrador sem precisar saber a senha. 
 
 **3 Cenários Mais utilizados de SQL Injection**
 
@@ -1352,18 +1357,19 @@ SELECT * FROM usuarios WHERE login = 'admin' --' AND senha= '...'
 | **Exfiltração de Dados (UNION SQLi)** | `' UNION SELECT id, nome, senha FROM usuarios --` | O invasor anexa tabelas sigilosas inteiras no resultado da consulta visível na tela, violando a LGPD. |
 | **Destruição / Adulteração (Stack Queries)** | `'; DROP TABLE pecas_industriais; --` | Dependendo do driver e das permissões do usuário, o invasor encerra a consulta atual e executa comandos de destruição em massa. |
 
+
 #### **A Defesa Definitiva: PREPARED STATEMENTS**
 
 Usar consulta com Prepared Statements evita que ocorra SQL Injection
 
 ```mermaid
-sequenciaDiagram
+sequenceDiagram
     autonumber
     participant App as Aplicação PHP
     participant SGBD as PostgreSQL
 
     Note over App, SGBD: FLUXO SEGURO COM PREPARED STATEMENT
-    App->>SGBD: 1. PREPARE: "SELECT * FROM usuarios WHERE lofin = :user"
+    App->>SGBD: 1. PREPARE: "SELECT * FROM usuarios WHERE login = :user"
     Note over SGBD: Compila a query, gera o plano de execução<br/>e define que :user É ESTRITAMENTE DADO!
     SGBD-->>App: Query compilada pronta para receber parâmetros
     App->>SGBD: 2. EXECUTE: [":user" => "admin' --"]
@@ -1373,9 +1379,9 @@ sequenciaDiagram
 
 **Por que a consulta preparada (`prepare`) é imune a injeções?**
 
-Quando utilizamos `$pdo->prepaRE()`, ocorre uma **separação física e temporal** entre o **comando SQL** e os **dados do usuário**:
-1. **Fase de Compilação(`prepare`)**: O banco recebe o molde da instrução com marcadores (`:paramentros`). Ele analisa a sintaxe, otimiza o caminho de busca e complica o plano de execução. A estrutura lógica da consulta está **fechada e congelada**
-2. **Fase de Envio dos Dados (`execute`)**: O PHP envia apenas os valores lierais. Mesmo que o invasor envie aspas, ponto-e-vírgula ou comandos `DROP`, o banco tratará tudo exclusivamente como um texto inofensivo pertence aquele campo.
+Quando utilizamos `$pdo->prepare()`, ocorre uma **separação física e temporal** entre o **comando SQL** e os **dados do usuário**:
+1. **Fase de Compilação(`prepare`)**: O BAnco recebe o molde da instrução com marcadores (`:parametros`). Ele analisa a sintaxe, otimiza o caminho de busca e compila o plano de execução. A estrutura lógica da consulta está **fechada e congelada**
+2. **Fase de Envio dos Dados (`execute`)**: O PHP envia apenas os valores literais. Memso que o invasor envie aspas, ponto-e-vírgula ou comandos `DROP`, o Banco tratará tudo exclusivamente como um texto inofensivo pertencente aquele campo.
 
 ---
 
@@ -1394,23 +1400,22 @@ $stmt->execute([$id, $nome, $email, $telefone]);
 2. **Marcadores Nomeados (`:nome`) - Padrão Recomendado**
 
 ```php
-//Autenticação Autoexplicativa, altamente legível e a prova de inversão de ordem
-$sql = "INSERT INTO usuarios (id, nome, email, telefone)
-VALUE (:id, :nome, :email, :telefone)";
+// Autenticação Autoexplicativa, altamente legível e a prova de inversão de ordem
+$sql = "INSERT INTO usuarios (id, nome, email, telefone) VALUE (:id, :nome, :email, :telefone)";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
     ":id"       => $id,
-    ":email"    => $email,
     ":nome"     => $nome,
+    ":email"    => $email,
     ":telefone  => $telefone
 ]);
 ```
 
 #### **Método de Vinculação de Valores: `bindValue()` Vs. `bindParam()`**
 
-Ao associar parâmetros a uma consulta `prepare`, pode-se ultilizar dois métodos com comportamentos distintos. O `bindValue()` ou o ``bindParam()`, o primeiro vincula um valor fixo no momento da chamada, enquanto o segundo vincula por referência e só avalia o valor real quando a consulta é executada.
+Ao associar parâmetros a uma consulta `prepare`, pode-se utilizar dois métodos com comportamentos distintos. o `bindValue()` ou o `bindParam()`, o primeiro vincula um valor fixo no momento da chamada, enquanto o segundo vincula uma variável por referência e só avalia o valor real quando a consultal é executada.
 
-**Exemplo `bindValue()`**: Associa o valor exato da variável naquele momento, é  mais comum e seguro para 95% dos casos de uso.
+**Exemplo `bindValue()`**: Associa o valor exato da variável naquele momento, é mais comum e seguro para 95% dos casos de uso.
 ```php
 $id = 10;
 $stmt->bindValue(":id", $id, PDO::PARAM_INT);
@@ -1452,13 +1457,12 @@ flowchart
 
 ---
 
-### Semana 10 - Sessões, Cokkies e Autenticação Segura
+### Semana 10 - Sessões, Cookies e Autenticação Segura
 
-**Tema:** Gestão de Estado com HTTP, Ciclo de Vida Sessão (`$_SESSION`), Cookies, Hashing de Criptografia, Middleware de Autenticação
+**Tema:** Gestão de Estado com  HTTP, Ciclo de Vida da Sessão(`$_SESSION`), Cookies, Hashing de Criptografia, Middleware de Autenticação
 
 #### **O Protocolo HTTP: Como ele lembra de você?**
- 
- 
+
 O Protocolo HTTP é totalmente **STATELESS (sem armazenamento de estado)**. Isso Significa que o servidor web trata cada requisição HTTP de forma isolada, como se fosse a primeira vez que ele estivesse interagindo com o usuário do sistema.
 
 **Situação sem Armazenamento de Cookie e SESSION**
@@ -1478,13 +1482,13 @@ sequenceDiagram
     Servidor -->> Cliente: 4. HTTP 302 Redirect -> login.php
 ```
 
-Para Resolver esse problema sem obrigar o usuário a digitar o logine senha novamente a cada clique fazemos o seguinte:
+Para resolver esse problema sem obrigar o usuário a digitar o logine senha novamente a cada clique fazemos o seguinte:
 1. Ao fazer o login bem-sucedido, o servidor entrega ao cliente uma **comanda/pulseira VIP numerada** (um identificador de sessão unica e aleatória)
 2. O navegador armazena essa comanda/pulseira em um **Cookie**
-3. A cada nova página solicitado, o navegador apresenta automaticamente essa pulseira no cabeçalho da requisição
+3. A cada nova página solicitada, o navegador apresenta automatiocamnet essa pulseira no cabeçalho da requisição
 4. O PHP l^o número da comanda/pulseira, localiza os dados do usuário aramazenado na memoria do servidor(`$_SESSION`) e reconhece quem é ele!
 
-**Situação com Artmazenamento de Cookie e SESSION**
+**Situação com Armazenamento de Cookie e SESSION**
 
 ```mermaid
 sequenceDiagram
@@ -1504,7 +1508,6 @@ sequenceDiagram
     Servidor->>Sessao: Busca os dados associados ao ID da sessão
     Sessao-->> Servidor: Retrona os dados do Usuário
     Servidor-->>Navegador: Exibe o dashboard autenticado
-
 ```
 
 #### **Como funciona o Cookie HTTP**
@@ -1546,14 +1549,15 @@ flowchart
     memoria <-->|"Persistência em Disco"| disco
     servidor -->|"Garante a Autenticação do Usuário"| cliente
 
-      style cliente fill:#ff00aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style cliente fill:#ff00aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
     style cookie fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
     style servidor fill:#aa00ff,stroke:#16a34a,stroke-width:2px,color:#14532d
     style memoria fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
     style disco fill:#e2e8f0,stroke:#64748b,stroke-width:2px,color:#1e293b   
+
 ```
 
-**Sintaxe Ess4ncial do PHP para Sessão**
+**Sintaxe Essencial do PHP para Sessão**
 
 ```php
 //configurar as sessão com funções nativas do PHP(ler documentação)
@@ -1574,14 +1578,14 @@ session_start();
 $_SESSION["usuario_id"] = 10;
 $_SESSION["usuario_perfil"] = "ADMIN";
 
-// 4. PErmitir a leitura dos dados em qualquer página do meu site
+// 4. Permitir a leitura dos dados em qualquer página do meu site
 $idLogado = $_SESSION["usuario_id"] ?? null; // se o usuario não tiver feito login a session é null
-
 ```
+---
 
 #### **Criptografia de Senhas**
 
-no passado, desenvolvedores armazenavam senhas utilizando funções matemáticas de integridade como `md5($senha)` ou `sha1($senha)`.
+No passado, desenvolvedores armazenavam senhas utilizando funções matemáticas de integridade como `md5($senha)` ou `sha1($senha)`.
 
 > O MD5 foi quebrado em 2004 e SHA1 foi quebrado em 2017.
 
@@ -1589,12 +1593,12 @@ no passado, desenvolvedores armazenavam senhas utilizando funções matemáticas
 
 O padrão de criptografia utilizado são o `Argon2id`, ou o `Bcrypt`
 
-**Caracteristicas da Criptografia de Hash**
-1. **Unidirecional(One-Way):** É matematicamente impossível descriptografar o hash para recuperar a senha original, já que o hash muda cada milisegundo
-2. **Salt Automático e Aleatório**: A cada execução, a função gera um vetor de `salt` único de 16bytes. Mesmo que 2 pessoas tenham a mesma senha, os hashes gerados serão completamente diferentes!.
-3. **Custo Ajustáveis**: É possível calibrar quanto de memória o algoritmo levará para calcular o hash
+**Caracterisiticas da Criptografia de Hash**
+1. **Unidirecional(One-way):** É matematicamente impossível descriptografar o hash para recuperar a senha original, já que o hash muda cada milisegundo.
+2. **Salt Automático e Aleatório**: A cada execução, a função gera um vetor de `salt` único de 16bytes. Mesmo que 2 pessoas tenham a mesma senha, os hashes gerados serão completamentes diferentes!.
+3. **Custos Ajustáveis**: É possível calibrar quanto de memória o algoritmo levará para calcular o hash
 
-**Sintax Profissional de Cryptografia Moderna**
+**Sintaxe Profissional de Cryptografia Moderna**
 
 ```php
 $senhaDigitada = *******
@@ -1614,6 +1618,7 @@ if(password_verify($senhaInformada, $hashDoBanco)){
     //Senha Incorreta
 }
 ```
+
 >[Aviso|]
 > Nunca tente fazer (password_hash($senha) === $hashDoBanco)
 > Como o `password_hash` gera um salt aleatório a cada milisegundo, a comparação por igualdade **sempre será falso**
@@ -1722,6 +1727,7 @@ $conta2 = new ContaBancaria("Douglas", 002, 500.00);
 echo $conta1->getSaldo(); // Exibir 100.00
 echo $conta2->getSaldo(); // Exibir 500.00
 ```
+
 >[!OBD:]
 >**Alocação de Objetos na Memória**
 > No PHP, variáveis que armazenam objetos, usam um  **identificador/referência** para o endereço na memória. Quando você passa um objeto para uma função ou método, está passando a referência na memória sobre aquele objeto, o que torna o POO extremamente performático.
@@ -1739,20 +1745,20 @@ quadrantChart
     "3. Herança": [0.75, 0.75]
     "4. Polimosrfismo": [0.75, 0.25]
 ```
+
 1. **Pilar 1: Abstração**
 **Definição**: Capacidade de filtrar detalhes irrelevantes e focar estritamente nas características e comportamentos essenciais da entidade para o contexto do software, que está sendo construido.
 *Exemplo:* Para um sistema bancário, o que importa em um cliente é seu nome, CPF e renda. Sua altura ou cor favorita são abstrações e podem ser descartados.
 
 2. **Pilar 2: Encapsulamento**
-**Definição**: Bildagem dos estads internos do objeto. Os atributos devem ser protegisdos conta acessos ou modificações diretas pelo mundo exterior. Alterações no estado só ocorrem através de métodos públicos que validam regras de negócio e mantêm invariantes contábeis. 
+**Definição**: Bildagem dos estads internos do objeto. Os atributos devem ser protegisdos conta acessos ou modificações diretas pelo mundo exterior. Alterações no estado só ocorrem através de métodos públicos que validam regras de negócio e mantêm invariantes contábeis.
 
 3. **Pilar 3: Herança**
-**Definição**: Mecanismo pelo qual uma classe filha (subclasse) herda atributos e comportamentos de uma classe ancestral (superclasse), promovendo o reuso de códigos e estabelenco uma relação de tipo **É UM** 
-*Exemplo*: Um cachorro(subclasse) é um Mamífero(sperclasse)
-=> porque ele herda caracteristicas da classe dos Mamíferos.
+**Definição**: Mecanismo pelo qual uma classe filha (subclasse) herda atributos e comportamentos de uma classe ancestral (superclasse), promovendo o reuso de códigos e estabelecendo uma relação do tipo **É UM**
+*Exemplo*: Um Cachorro(subclasse) é um Mamífero(superClasse)=> porque ele herda caracteristicas da classe dos Mamíferos. 
 
 4. **Pilar 4: Polimorfismo**
-**Definição**: Princípio que permite que classe filhas diferente respondam a mesma chamada de método, porém, com mimplementações especializads e comportamentos distintos. O chamador não precisa saber qual subclasse exata está executando, apenas confia que o método cumpra o contrato.
+**Definição**: Princípio que permite que classe filhas diferentes respondam a mesma chamada de método, porém, com mimplementações especializads e comportamentos distintos. O chamador não precisa saber qual subclasse exata está executando, apenas confia que o método cumpra o contrato.
 
 #### **Encapsulamento**
 
@@ -1790,9 +1796,8 @@ flowchart TD
     style pub fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 ```
 
-**Usando Getters and Setteers**
- 
- Ao Declarar 
+**Usando Getters and Setters**
+
 Ao Declarar atributos privados ou protegidos (`private` ou `protected`), se você deseja manipular esses atributos é importante criar os **Modificadores de Acesso** atraavés dos `getters and setters`
 
 *Exemplo:* Ao criar um atributos `private float $saldo`, para modificar os valores do saldo ou ler o saldo é importante criar os métoso públicos.
@@ -1801,7 +1806,7 @@ Ao Declarar atributos privados ou protegidos (`private` ou `protected`), se voc�
  * `public function setSaldo()` : Permite alterar o valor do saldo
 
 >[!Cuidado]
-> **Não destrua seu encapsulamento**: para atributos que não serão modificados, como CPF, por exemplo não há necessidade de criar `setCPF()`, o CPF de uma pessoa não será modificado algo longo da vida.
+> **Não destrua seu encapsulamento**: para atributos que não serão modificados, como CPF, por exemplo, não há necessidade de criar um `setCPF()`, o CPF de uma pessoa não será modificado alo longo da vida.
 
 #### **Herança, Classes Abstratas e Polimorfismo**
 
@@ -1828,14 +1833,15 @@ $conta =  new ContaBancaria(100); //Error:Cannot instantiate abstract class Cont
 //Não pode instanciar OBJ da Classe Abstrata
 ```
 
-**Herança**: Usar o mecanismo de cração de subClasse a partir da superClasse(extends)
+**Herança**: Usar o mecanismo de criação de subclasse a partir da superclasse (extends)
+
 ```php
 class ContaCorrente extends ContaBancaria {
-    //Não precisa redeclarar os atributos e métodos já criados na superclasse
-    //A única coisa que precisamos implementar é o método sacar
+    //não precisa redeclarar os atributos e métodos já criados na superclasse
+    //a unica coisa que preciso implementar é o método sacar
     public function sacar(float $valor): void {
-        //Implementar a lógica de negocio para ContaCorrete
-        $this->saldo -= $valor + 2.50; // Taxa de Saque de 2.50
+        //Implemetar a lógica de negocio para ContaCorrente
+        $this->saldo -= $valor + 2.50; //Taxa de Saque de 2.50
     }
 }
 
@@ -1907,6 +1913,7 @@ class TitularSemProperty {
 }
 ```
 
+
 **Exceções de Domínio: Tratamento de Erros do Sistema**
 
 Um dos maiores erros cometidos em sistemas procedurais é o retorno mágico de valores como `-1`, `false` ou `null` quando uma regra de negócio é violada.
@@ -1931,6 +1938,8 @@ flowchart TD
 
 >[!OBS]
 >`try/catch` é o mecanismo de captura de exceções do PHP. Ele permite que você trate erros de forma inteligente, mantendo a integridade do sistema e fornecendo feedback claro ao usuário.
+
+---
 
 ### Semana 12 - Arquitetura MVC Artesanal
 
@@ -1973,7 +1982,7 @@ $produtos = $pdo->query("SELECT * FROM produtos")->fetchAll();
 
 **Os Problemas Críticos do Código Espaguete**
 
-1. *Acoplamento Máximo*: Se você mudar o layout visual, corre o risco de quebrar uma query SQL. Se alterar uma coluna do banco, precisa reescrever o arquivo visual.
+1. *Acoplamento Máximo*: Se você mudar o layout visual, corre o risco de quebrar uma query SQL. Se alterar uma coluna do banco, precisa reescrever o arquivo vicual. 
 2. *Fragicilidade de Inclusões (`required_once`):* Se um arquivo for movido de pasta, todas as chamadas `required_once`quebram com erros fatais de arquivos não encontrados.
 3. *Exposição de Segurança*: Se os arquivos PHP estiverem na raiz acessível do servidor web, qualquer usuário malicioso pode tentar acessar scripts internos digitando `http://site.com/config/conexao.php`.
 
@@ -1983,8 +1992,31 @@ flowchart
             arq["produtos.php<br/> Consultas SQL Diretas<br/> HTML e Tags CSS<br/> Regras de Negócio<br/> 10x Require_once manuais"]
     end
 
-    style Caótico fill: #f8b9dc, stroke: #f382c0, stroke-width: 2px, color: #ff3bbe
+    style Caótico fill: #fee2e2, stroke: #dc2626, stroke-width: 2px, color: #7f1d1d
 ```
+
+#### **A Triade Model-View-Controller (MVC) no BackEnd
+
+O Padrão **MVC (Model-View-Controller)** é a arquitetura de software corporativa mais consagrada da hístoria da web. Seu Objetivo é separar as preocupações do sistema em **3 camadas bem definidas**:
+
+```mermaid
+flowchart TD
+
+    subgraph MVC ["Padrão Arquitetural MVC (Responsabilidade Única)"]
+        controller["Controller<br/>(Maestro do Fluxo)"]
+        model["Model<br/>(Regras de Negócio & Banco)"]
+        view["View<br/>(Apresentação Visual Limpa)"]
+
+        controller -->|"1. Pede dados"| model
+        model -->|"2. Devolve entidades"| controller
+        controller -->|"3. Injeta dados"| view
+    end
+
+    style controller fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#312e81
+    style model fill:#dcfce7,stroke:#15803d,stroke-width:2px,color:#14532d
+    style view fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+```
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -2007,17 +2039,17 @@ sequenceDiagram
     View-->>Cliente: Retorna HTML estruturado e sanitizado
 ```
 
-1. **Model (Camada de Modelo de Négocio e Dados)**
-- **O que Faz**: Representa as entidade do mundo real e gerencia a lógica de dados, perpersistência e regras de negócio
+1. **Model (Camada de Modelo de Negócio e Dados)**
+- **O que Faz**: Representa as entidade do mundo real e gerencia a lógica de dados, persistência e regras de negócio
 - **O que sabe**: Sabe como conectar ao banco de dados, executar Prepared Statement, validar se um preço é positivo (RN) e calcular totais de estoque(RN)
-- **O que NUNCA faz**: Nunca emite comando `echo`, nunca gera tag HTML e nunca lê dados da superglobal `$_POTS` ou ``$_GET`.
+- **O que NUNCA faz**: Nunca emite comando `echo`, nunca gera tag HTML e nunca lê dados da superglobal `$_POST` ou `$_GET`.
 
 2. **View (Camada de Visualização e Apresentação)**
 - **O que Faz**: Renderiza a interface gráfica do usuário(geralmente HTML, CSS, JSON).
 - **O que sabe**: Recebe variáveis simples enviadas pelo Controller e as formata visualmente, aplicando sanitizção ativa contra XSS(`htmlspecialchars`)
 - **O que NUNCA faz**: Nunca executa consultas SQL, nunca faz regras de negócios complexa e nunca redireciona requisições via `header()`
 
-3. **Controller (Camada de Controle e Orquestração)**
+1. **Controller (Camada de Controle e Orquestração)**
 - **O que Faz**: Atua como o maestro da aplicação. REcebe a requisição do usuário, valida as entradasm aciona a camada Model para obter ou persistir informações e seleciona a View correspondente para renderizar a resposta
 - **O que sabe**: Sabe qual Model chamar e qual View devolver.
 - **O que NUNCA faz**: Não deve conter regras contábeis complexas (elas pertencem ao Model) e não deve escrever HTML diretamente.
@@ -2033,9 +2065,9 @@ flowchart LR
     codigo["use App\\Models\\Produto;<br/>$p = new Produto();"] -->|"PHP intercepta a chamada"| auto
     auto -->|"Mapeia 'App\\' para 'src/'"| disco["Carrega do disco:<br/>src/Models/Produto.php"]
 
-    style comp fill:#f8b9dc,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    style auto fill:#f8b9dc,stroke:#16a34a,stroke-width:2px,color:#14532d
-    style disco fill:#f8b9dc,stroke:#4338ca,stroke-width:2px,color:#312e81
+    style comp fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style auto fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style disco fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#312e81
 ```
 
 **O que é o Composer?**
@@ -2045,6 +2077,7 @@ O **Composer** é o gerenciador de dependências oficial da linguagem PHP. Ele d
 2. **Gerar o Autoloader Automático:** O Composer lê as classes criadas por você no seu projeto e as disponibiliza automaticamente no código sem a necessidade de nenhum `require`.
 
 **As Especificações do PSR-4 (PHP Stadart Recommendation 4)**:
+
 A especificação internacional **PSR-4** dita que:
 > *O namespace de uma classe deve espelhar exatamente a estrutura de diretórios no disco físico onde o arquivo está gravado.*
 
@@ -2096,9 +2129,9 @@ flowchart TD
     router -->|"Combina Rota"| c3["ProdutoController::salvar()"]
     router -.->|"Não encontra"| c4["HTTP 404 Not Found"]
 
-    style fc fill:#f8b9dc,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    style router fill:#f8b9dc,stroke:#16a34a,stroke-width:2px,color:#14532d
-    style c4 fill:#f8b9dc,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    style fc fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style router fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style c4 fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
 ```
 
 **Por que isolar o diretório `public/`?**
@@ -2107,3 +2140,186 @@ Por razões estritas de **Segurança da Informação**:
 1. O servidor web aponta sua raiz estritamente para a pasta `public/`.
 2. As pastas `src/`, `config/`, `vendor/` e os arquivos `.ini` e `.env` ficam **um nível acima da raiz pública**.
 3. Mesmo que um atacante tente digitar diretamente a URL de um arquivo sensível (ex.: `http://site.com/config/database.ini`), o servidor web bloqueia o acesso, pois o arquivo não reside na pasta pública.
+
+
+---
+
+### Semana 13 - Introdução ao Framework Laravel e Artisan CLI
+
+**Tema:** Módulo 3 - Framework Laravel, Evolução da Arquitetura MVC Artesanal para MVC do Ecossistema Laravel, Estrutura Enxuta, Mapeamento de Diretórios. Gestão Segura de Ambientes com `.env`, Chaves Criptografadas de aplicação, Ferramenta de Linha de Comando `Artisan CLI`, Ciclo de Vida de Requisição do Framework. 
+
+
+#### **O que é o Framework Laravel?**
+
+Criado em 2011 por Taylor Otwell, o **Laravel** é atualmente o framework mais popular e consolidade do ecossistema PHP. Ele é um **framework MVC Completo**, que oferece uma estrutura de desenvolvimento robusta, segura e escalável para aplicações web modernas e corporativas. Ele Adota o Princípio de **Convenção sobre Configuração** e Entrega uma série de recursos prontos para uso, incluindo:
+
+1. **Produtividade Imediata**: Estrutura padronizada onde todo desenvolvimento segue convenções claras, reduzindo a necessidade de configuração manual.
+2. **Segurança por Padrão(Security by Default)**: Proteção nativa e automática contra XSS, CSRF, SQL Injetion, manipulação indevida de cookies e ataques de força brute.
+3. **ORM Eloquent**: Uma ferramenta de mapeamento objeto-relacional (ORM) que simplifica a interação com banco de dados, permitindo consultas e manipulações de dados usando sintaxe PHP fluente.
+4. **Ferramenta de Linha de Comando (Artisan CLI)**: Automatiza a criação de classes, execução de migrações de banco, limpeza de cache e outras tarefas repetidas, aumento de produtividade no desenvolvimento.
+5. **Comunidade Global e Ecossistema Rico**: Milhares de pacotes prontos para autenticação robusta, mensageria, fila assincronas, geração de APIs restful, testes automatizados e muito mais. 
+
+Ao longo das últimas semanas, estudamos a estrutura de projetos em PHP puro. E agora, vamos migrar para o **Laravel**, abaixo uma tabela comparativa entre o MVC artesanal e o Laravel:
+
+Componente Arquitetural | No Seu MVC Artesanal (Semana 12) | No Framework Laravel (Semana 13+) | Vantagem Competitiva no Mercado |
+| :--- | :--- | :--- | :--- |
+| **Ponto Único de Entrada** | `public/index.php` | `public/index.php` | Mesma raiz segura: isola todo o código-fonte da web pública. |
+| **Autoload de Classes** | `composer.json` (PSR-4: `"App\\": "src/"`) | `composer.json` (PSR-4: `"App\\": "app/"`) | Padrão unificado internacional da PHP-FIG. |
+| **Mecanismo de Roteamento** | `App\Core\Roteador` com array interno | `routes/web.php` e `routes/console.php` | Roteamento declarativo com middlewares, parâmetros dinâmicos e grupos de rotas. |
+| **Camada de Controle** | `App\Controllers\ProdutoController` | `App\Http\Controllers\AtivoController` | Integração automática com Injeção de Dependências e validação de Form Requests. |
+| **Camada de Dados (Model)** | `App\Models\Produto` com PDO manual | `App\Models\Ativo` (*Eloquent ORM*) | Mapeamento Objeto-Relacional avançado com relacionamentos expressivos (`hasMany`, `belongsTo`). |
+| **Camada de Visualização** | Scripts PHP nativos com `extract()` | Motor de Templates **Blade** (`.blade.php`) | Sintaxe limpa, herança de layouts, componentes reutilizáveis e escape automático contra XSS. |
+| **Isolamento de Credenciais** | `config/database.ini` | Arquivo `.env` (Padrão 12-Factor App) | Paridade entre ambientes (local, homologação e nuvem) com segurança estrita. |
+
+>[!Observação]
+>Construir o MVC Artesanal na semana 12 foi como desmontar e criar a mão cada engrenagem, pistão e freio de um motor automotivo. Agora que você compreendeu como montar funciona, não precisa mais reinventar a roda em cada nova fase, você já assume a cabine do piloto de Fórmula 1 de última geração. 
+
+#### **Rotas Enxutas e Parametrizadas com Laravel 11**
+
+No **Lavarel 11**, lançado com foco em performance, e simplicidade, a arquitetura foi completamente desidratada e enxuta. Permitindo que o desenvolvedor foque mais na lógica de negócio e menos em configurações complexas. Abaixo, um exemplo de rotas simples e parametrizadas:
+
+```php
+use App\Http\Controllers\AtivoController;
+
+Route::get('/', [AtivoController::class, 'index'])->name('ativos.index');
+Route::get('/ativos/create', [AtivoController::class, 'create'])->name('ativos.create');
+Route::post('/ativos', [AtivoController::class, 'store'])->name('ativos.store');
+Route::get('/ativos/{ativo}/edit', [AtivoController::class, 'edit   '])->name('ativos.edit');
+Route::put('/ativos/{ativo}', [AtivoController::class, 'update'])->name('ativos.update');
+Route::delete('/ativos/{ativo}', [AtivoController::class, 'destroy'])->name ('ativos.destroy');
+``` 
+
+As 3 Grandes Mudanças Estruturais do Laravel 11:
+1. **O Novo Núcleo `bootstrap/app.php`:** Toda a configuração de rotas (`web`, `commands`), middlewares globais e tratamento centralizado de exceções agora é feita de forma fluida (*fluent API*) em um único arquivo.
+2. **Rotas Minimalistas por Padrão:** O arquivo `routes/web.php` já vem pronto para rotas de interface web. As rotas de API (`routes/api.php`) só são criadas quando o desenvolvedor decide ativá-las através do comando `php artisan install:api`.
+3. **Menos Boilerplate em Controllers e Models:** Classes base limpas, sem heranças desnecessárias de dezenas de traits que não estavam sendo utilizados.
+
+
+#### **3. O Mapeamento de Diretórios do Laravel**
+
+Ao criar uma nova aplicação Laravel, a estrutura de diretórios é organizada de forma a separar claramente as responsabilidades do sistema. Usando o Princípio de Responsabbilidade Única**.
+
+```text
+senai-asset-manager/
+├── app/                  <- O coração da sua lógica de negócios
+│   ├── Http/
+│   │   └── Controllers/  <- Seus Controllers residem aqui
+│   ├── Models/           <- Seus Modelos Eloquent residem aqui
+│   └── Providers/        <- Provedores de serviços da aplicação
+├── bootstrap/            <- Inicialização do framework
+│   ├── app.php           <- Ponto central de configuração de rotas e middlewares
+│   └── cache/            <- Caches de inicialização do sistema
+├── config/               <- Arquivos de configuração publicáveis (banco, sessão, etc.)
+├── database/             <- Engenharia de Banco de Dados
+│   ├── factories/        <- Fábricas de dados falsos para testes (Faker)
+│   ├── migrations/       <- Controle de versão do esquema do banco de dados
+│   └── seeders/          <- Scripts para popular tabelas com dados iniciais
+├── public/               <- A ÚNICA PASTA ACESSÍVEL PELO SERVIDOR WEB
+│   ├── css/              <- Folhas de estilo compiladas
+│   ├── js/               <- Scripts front-end
+│   ├── index.php         <- O Front Controller da aplicação
+│   └── robots.txt
+├── resources/            <- Recursos brutos da interface com o usuário
+│   ├── css/              <- Arquivos CSS pré-compilação (Tailwind)
+│   ├── js/               <- Arquivos JavaScript pré-compilação
+│   └── views/            <- Templates do motor de visualização Blade (.blade.php)
+├── routes/               <- Mapeamento de rotas do sistema
+│   ├── console.php       <- Comandos de terminal customizados baseados em Closure
+│   └── web.php           <- Rotas HTTP para navegadores (com cookies e sessões)
+├── storage/              <- Arquivos gerados em tempo de execução
+│   ├── app/              <- Uploads e arquivos gerados pelo sistema
+│   ├── framework/        <- Sessões de arquivo, views compiladas e caches
+│   └── logs/             <- Logs cronológicos de erro e auditoria (laravel.log)
+├── tests/                <- Testes automatizados unitários e de integração
+├── .env                  <- ARQUIVO CONFIDENCIAL de variáveis de ambiente
+├── .env.example          <- Modelo público de variáveis para a equipe
+├── .gitignore            <- Impede o vazamento de segredos para o Git
+├── artisan               <- O executável da CLI Artisan
+└── composer.json         <- Manifesto de dependências e autoload PSR-4
+```
+
+> [!Cuidado]
+> Apenas a pasta ``public/` deve ser apontada pelo servidor web.
+> Nunca aponte o servidor web para a raiz do projeto! Se fizer isso, qualquer visitant poderá navegar até `http://seusite.com/.env` e baixar todas as senhas do banco de dados e chaves de API da empresa.
+
+> [!Observação]
+> `.env` ou `database.ini`: são arquivos para armazenamento de informações/dados sensíveis de aplicação.
+> `.gitignore`: nesse arquivo são colocados os nomes dos arquivos e pastas que não devem ser versionados (não são expostos no git e github).
+
+#### **Segurança no Ambiente de Desenvolvimento e Produção**
+
+Em Sistemas corporativos, uma aplicação passa por múltiplos ambientes ao longo do seu ciclo de desenvolvimento.
+
+- **Ambiente local**: Na máquina de trabalho do desenvolvedor, com exibição detalhada de erros e banco de dados local.
+- **Ambiente de Homologação**: Servidor de testes, onde a equipe de QA valida funcionalidades antes do lançamento.
+- **Ambiente de Produção**: Servidor público, onde a aplicação é acessada pelos usuários finais. Aqui, erros detalhados não devem ser exibidos para o público. `APP_DEBUG` deve ser `false` para não expor informações sensíveis.
+
+1. **O Padrão de Segurança `12-Factor`e o Arquivo `.env`**
+
+Em vez de alterar senhas dentro do código PHP a cada deploy, o Laravel utiliza o padrão internacional de isolar as variáveis que mudam de ambiente em um arquivo de texto simples chamado `.env` (Environments Variables).
+
+2. **A Chave de Segurança `APP_KEY`**.
+
+A `APP_KEY` é a sequencia criptografada aleatória de 32 bytes codificada em Base64 gerada automaticamente pelo Laraval, como padrão de segurança em qualquer aplicação.
+
+>[!Observação]
+> Se a `APP_KEY` estiver vazia, o Laravel recusará a execução exibindo um erro na tela *No Apllication encryption key has benn pecifid*
+> e ocorrer a troca da `APP_KEY` em um sistema em produção, todas as sessões ativas cairão e o dados cifrados com a chave antiga se tornarão inválidos e irreuperáveis.
+
+3. **O Papel do `.env.example`**
+
+Como o arquivo `.env`está listado no `.gitiognore` e nunca vai para o GitHub, como um colega de equipe sabe quais variáveis ele precisa configurar ao clonar o repositório?  Através do `.env.example`, ele serve como um template documentado contendo as mesma chaves do `.env`, porrém com valores fictícios ou vazios. 
+
+```mermaid
+flowchart TD
+    key["APP_KEY (32 bytes aleatórios)<br/>Guardada com exclusividade no .env"]
+    
+    key --> op1["Criptografia de Cookies de Sessão<br/>(Impede adulteração no navegador)"]
+    key --> op2["Criptografia de Senhas e Tokens<br/>(Algoritmo AES-256-CBC)"]
+    key --> op3["Assinatura de URLs Temporárias<br/>(Links de recuperação de senha seguros)"]
+
+    style key fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    style op1 fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style op2 fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style op3 fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+```
+
+#### #### **5. Artisan CLI: O poder da Linha de Comando**
+
+O **Artisan CLI** é a interface de linha de comando (Command-Line-Interface) nativa do Laravel. Ele é executado a partir do arquivo executável `artisan` localizado na raiz do projeto.
+
+```bash
+php artisan [comando] [argumentos] [opções]
+```
+
+**Principais comandos do artisan CLI para a rotina de desenvolvimento**
+
+. `php artisan serve`
+Inicializa o servidor HTTP local embutido de desenvolvimento, escutando por padrão em `http://127.0.0.1:8000`. É muito superior ao `php -S localhost:8000 -t public` tradicional porque já configura automaticamente o roteamento de assets estáticos e tratamento de reescrita de URL.
+- Para mudar a porta: `php artisan serve --port=8080`
+
+2. `php artisan key:generate`
+Gera uma chave criptográfica segura de 256 bits através de gerador de números pseudoaleatórios criptograficamente seguros e grava diretamente na variável `APP_KEY` do seu arquivo `.env`.
+
+3. `php artisan about`
+Introduzido nas versões modernas do Laravel, este comando faz uma varredura completa da saúde do ecossistema e imprime uma tabela no terminal com:
+- Versão do PHP e extensões carregadas.
+- Versão do Laravel instalada.
+- Status do ambiente (`local`, `production`).
+- Status do modo de depuração (`Debug Mode: ENABLED/DISABLED`).
+- Drivers ativos de Banco de Dados, Cache, Sessão e Filas.
+
+4. `php artisan list`
+Exibe o catálogo completo de comandos disponíveis na aplicação, agrupados por categorias (`make:`, `migrate:`, `route:`, `db:`, `config:`).
+
+5. `php artisan make:controller NomeDoController`
+Gera automaticamente um novo arquivo de classe Controller já configurado com o namespace correto (`App\Http\Controllers`), herança da classe base e declarações estritas, eliminando erros manuais de digitação.
+
+6. `php artisan make:model NomeDoModel`
+Gera automaticamente a classe de modelo Eloquent sob a pasta `App\Models`.
+
+7. `php artisan route:list`
+Gera uma tabela formatada no terminal listando todas as rotas registradas na aplicação, incluindo os verbos HTTP correspondentes (GET, POST), URIs, nomes de rota e a respectiva ação no Controller.
+
+8. `php artisan tinker`
+Abre um terminal interativo (*REPL - Read-Eval-Print Loop*) baseado no PsySH. Permite testar comandos PHP, instanciar models, consultar bancos de dados e verificar configurações diretamente pela linha de comando com toda a aplicação Laravel inicializada em memória!

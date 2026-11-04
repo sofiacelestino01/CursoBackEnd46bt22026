@@ -28,7 +28,7 @@ final class AuthController extends Controller {
         $senha = (string)($_POST["senha"] ?? "");
         //buscar as informações do usuário
         $usuario = Usuario::buscarPorEmail($email);
-        if($usuario && password_verify($senha, $usuario["senha_hash"])) {
+        if($usuario && $senha === $usuario["senha_hash"]) {
             session_regenerate_id(true);
             $_SESSION["usuario_id"] =(int)$usuario["id"];
             $_SESSION["usuario_nome"] =$usuario["nome"];

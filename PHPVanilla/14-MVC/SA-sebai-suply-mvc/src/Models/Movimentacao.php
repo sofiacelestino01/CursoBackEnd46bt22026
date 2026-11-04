@@ -92,7 +92,8 @@ final class Movimentacao
     }
 
     //listar as movimentações do estoque
-    public static function listarHistorico(int $limite = 20): array {
+    public static function listarHistorico(int $limite = 20): array
+    {
         $sql = "SELECT m.id, m.tipo, m.quantidade, m.motivo, m.criado_em,
                        p.nome AS produto_nome, u.nome AS usuario_nome
                 FROM movimentacoes m
@@ -103,5 +104,5 @@ final class Movimentacao
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
-}
+    }
 }

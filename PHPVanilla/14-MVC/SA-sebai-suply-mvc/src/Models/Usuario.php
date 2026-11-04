@@ -26,4 +26,15 @@ final class Usuario {
         $resultado = $stmt->fetch();
         return $resultado ?: null;
     }
+
+    //metodo para localizar o usuario pelo ID
+    //método para consultar por id
+    public static function buscarPorId(int $id): ?array {
+        $sql = "SELECT id, nome, email, perfil FROM usuarios WHERE id = :id LIMIT 1";
+        $stmt = self::pdo()->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $resultado = $stmt->fetch();
+        return $resultado ?: null;
+    }
+
 }
