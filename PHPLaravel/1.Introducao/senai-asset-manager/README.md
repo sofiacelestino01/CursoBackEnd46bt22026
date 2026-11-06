@@ -130,4 +130,22 @@ Execute a sequência de 7 testes de validação técnica no laboratório:
    Execute `php artisan about` no terminal.  
    *Resultado Esperado:* Todos os indicadores técnicos devem estar validados em verde.
 
+---
 
+# Continuação do Projeto: contrução da getão de parceiros industriais (módulo cliente)
+
+## Criação do model e migração do banco de dados
+
+Crie o model e o arquivo de migração para a tabela `clientes`
+
+`php artisan make:Model Cliente -m`
+
+-m => diretamente relacionada a migração o banco de daddos
+
+## Gera e Implementar `ClienteController`
+
+`php artisan make:controller ClienteController --resource`
+
+é criado o arquivo 
+
+`app/Http/Controllers/ClienteController.php`
