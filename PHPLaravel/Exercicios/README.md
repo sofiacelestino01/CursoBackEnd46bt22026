@@ -494,25 +494,3 @@ Status restaurado ao final do teste → ATIVO
 | `resources/views/fornecedores/show.blade.php` | Ficha pública de fornecedor |
 | `resources/views/admin/auditoria/clientes.blade.php` | Painel de auditoria administrativa |
 
----
-
-# CHECKLIST DE QUALIDADE E BOAS PRÁTICAS
-
-- [x] Todas as ações do CRUD de clientes usam verbos HTTP semânticos (`GET`, `POST`, `PUT/PATCH`, `DELETE`).
-- [x] O `ClienteController` foi gerado via Artisan com a flag `--resource`.
-- [x] As rotas de formulário `POST`, `PUT`, `PATCH` e `DELETE` contêm `@csrf`.
-- [x] Os formulários de edição, exclusão e status usam Method Spoofing (`@method('PUT')`, `@method('DELETE')`, `@method('PATCH')`).
-- [x] As URLs de links e formulários usam o helper `route('nome.da.rota')`.
-- [x] `store()` e `update()` recebem `Request $request` via Injeção de Dependências.
-- [x] Os parâmetros dinâmicos possuem constraints ativas (`whereNumber`, `whereAlphaNumeric`, `where` com regex).
-- [x] Todos os métodos possuem no máximo 20 linhas.
-- [x] Os 35 arquivos PHP do projeto (fora `vendor` e views Blade) possuem `declare(strict_types=1);`.
-- [x] Comentários e documentação técnica estão em português do Brasil (pt-BR).
-
----
-
-# Observações finais
-
-- A pasta `PHPLaravel/Exercicios/senai-asset-manager` é uma cópia executável do projeto `senai-asset-manager`, mantendo o mesmo padrão de controllers, models, views Blade e configuração de banco.
-- Os dados de contratos e fornecedores são simulados para que o laboratório foque em **Controllers e Routes**, sem exigir novas migrações.
-- Caso a atividade evolua para persistência real, o próximo passo natural é criar os models `Contrato` e `Fornecedor` com suas migrations e relacionamentos, mantendo as mesmas rotas e constraints já implementadas.
