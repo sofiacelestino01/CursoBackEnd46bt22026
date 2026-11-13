@@ -2626,3 +2626,70 @@ O Laravel resolve isso através de técnica de **Method Spoofing**: que define c
 </form>
 ``` 
 
+---
+
+## Semana 15 - Motor de Templates (Blade), Herança e Layout e Componentes no LARAVEL 
+
+**Tema:** Template Blad, Ciclor de Compilação e Chache de Views, Interpolação de Dados, Diretivas Condicionais, Laços de Repetição, Interação, Layouts Mestres (Herança)
+
+#### **1. A Camada de Visualização (Blade)**
+
+Nas semanas anteriores, construimos as bases do Laravel:
+- Semana 13: infraestrutura do Laravel, Ambiente enxuto, .env e os comandos do Artisan CLI
+- Semana 14: roteamento RESTful, Verbos HTTP (GET, POST, PUT, DELETE)
+
+Nesta semana iremos estudar a interface visual da aplicação e a diferença entre o PHP Vanila e o PHP Laravel
+
+**Exemplo de uso do da Camada de Visualização no PHP Vanila:**
+
+```php
+<!-- ARQUIVO LEGADO: lista_ordens.php (O PESADELO DA MANUTENÇÃO) -->
+<!DOCTYPE html>
+<html>
+<head><title>Sistema de Manutenção</title></head>
+<body>
+    <header><h1>SENAI Manutenção</h1><nav>Menu...</nav></header>
+    <?php
+    // Mistura de lógica de banco e HTML solto
+    $ordens = $pdo->query("SELECT * FROM ordens")->fetchAll();
+    foreach ($ordens as $o) {
+        // Vulnerabilidade Crítica de XSS: Sem sanitização na saída
+        echo "<div>" . $o['titulo'] . " - " . $o['responsavel'] . "</div>";
+    }
+    ?>
+    <footer>SENAI 2026</footer>
+</body>
+</html>
+```
+
+Os problemas da Abordagem PHP Vanilla:
+1. **Duplicidade de Códigos**: Se aplaicação possuir 30 telas, as tags `<DOCTYPE html>` `<head>` e outras  como menus, rodapés deverão ser copiads e coladas 30 vezes. Se o logotipo da empresa mudar, por exemplo, o desenvolvedor terá que editar 30 vezes os arquivos manualmente
+2. **Vulnerabilidade a Ataques XSS**: Ao utilizarmos `echo $variavel` sem `htmlspecialchars()`, qualquer script malicioso pode ser gravado no banco de dados(ex: `<script>RoubarCookies()</script>`)será executado silenciosamente no navegador do usuário.
+3. Acoplamento Extremo**: A lógica de decisão de apresentação fica misturada com HTML bruto, inviabilizando teste e fica misurando Com HTML bruto, inviabilizando teste e colaboração entre equipes de BACK-End e Front-End.
+
+**A Diferenca entre a Abordagem Caótica e o Blade**
+
+```mermaid
+flowchart TD
+    subgraph Caotico ["Abordagem Legada (Insegura e Repetitiva)"]
+        arq1["ordem_criar.php<br/>• Repete cabeçalho e menu<br/>• echo sem escape<br/>• Sem componentes"]
+        arq2["ordem_listar.php<br/>• Repete cabeçalho e menu<br/>• if/else procedural<br/>• HTML duplicado"]
+        arq3["equipamento_listar.php<br/>• Repete cabeçalho e menu<br/>• Risco de XSS<br/>• Zero modularidade"]
+    end
+
+    subgraph Blade ["Arquitetura Blade no Laravel 11 (Modular e Segura)"]
+        layout["Layout Mestre Compartilhado<br/>(resources/views/layouts/app.blade.php)"]
+        comp["Componentes Reutilizáveis<br/>(<x-card-kpi>, <x-badge-status>, <x-alert>)"]
+        views["Views Filhas Leves<br/>(Apenas o conteúdo específico com @extends)"]
+
+        layout --> views
+        comp --> views
+    end
+
+    style Caotico fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    style Blade fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+```
+#### **2. A Compilação do Blade**
+
+O **Blade** é o motor de templats nativos e exclusivos do framework Laravel. Oferencendo uma sintaxe expresiva, limpa e etremamente produtiva para construção de interfaces visuais.
+
