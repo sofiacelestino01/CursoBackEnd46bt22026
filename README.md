@@ -2725,4 +2725,28 @@ sequenceDiagram
 
 >[!OBS]
 > **Comando Artisan Essencial para o Blade:**
-> - ``php artisan view:clear`
+> - ``php artisan view:clear` -> Limpa todo o cache de views compilados (essencial durante depuraçao de layouts).
+> - `php artisan view:cache` -> Pré-compila todas as views da aplicação de uma só vez (recomendado ao realizar deploy em produção)
+
+#### **3. Sintaxa de Interpolação e Defesa contra XSS**
+
+**Interpolçao Segura com Escape Automático (`{{}}`):**
+
+A sintaxe `{{ $variavel }}` é a forma padrão de exibição de dados no Blade:
+
+O Blade envolve internamente a variável com a função nativa `htmlspecialchars($variavel, EN_QUOTES, "UTF-8", true)`.
+
+```blade
+<!-- Exemplo de Entrada Maliciosa digitada por um usuário em um formulário: -->
+@php
+    $descricaoSensor = "<script>alert('Vulnerabilidade XSS!');</script>";
+@endphp
+
+<!-- Como você escreve no Blade: -->
+<p>{{ $descricaoSensor }}</p>
+
+<!-- O que o Blade gera no HTML compilado: -->
+<!-- &lt;script&gt;alert('Vulnerabilidade XSS!');&lt;/script&gt; -->
+```
+
+
